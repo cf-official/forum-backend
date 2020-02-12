@@ -2,8 +2,14 @@ import {
     Entity,
     PrimaryColumn,
     Column,
-    CreateDateColumn
+    CreateDateColumn,
+    ManyToOne,
+    JoinColumn
 } from 'typeorm';
+
+import {
+    UserEntity
+} from 'src/users/user.entity';
 
 @Entity('category')
 export class CategoryEntity {
@@ -19,8 +25,11 @@ export class CategoryEntity {
     @CreateDateColumn()
     timestamp: Date;
 
-    @Column('bigint')
-    creator: string;
+    @ManyToOne(
+        () => UserEntity,
+        user => user.categories
+    )
+    creator: UserEntity;
 
     @Column('json')
     advancedPerms: object;

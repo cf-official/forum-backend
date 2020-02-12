@@ -6,17 +6,15 @@ import {
     Put,
     Body,
     Param,
-    UsePipes
+    UsePipes,
+    UseGuards
 } from '@nestjs/common';
-import {
-    CategoriesService
-} from './categories.service';
-import {
-    CategoryDTO
-} from './category.dto';
-import {
-    ValidationPipe
-} from './../shared/validation.pipe';
+
+import { CategoriesService } from './categories.service';
+import { CategoryDTO } from './category.dto';
+import { ValidationPipe } from './../shared/validation.pipe';
+import { AuthGuard } from 'src/shared/auth.guard';
+import { User } from 'src/users/user.decorator';
 
 @Controller('categories')
 export class CategoriesController {
@@ -34,9 +32,10 @@ export class CategoriesController {
      * Creates new category and saves it to the database
      */
     @Post('new')
+    @UseGuards(new AuthGuard())
     @UsePipes(new ValidationPipe())
-    public createNewCategory(@Body() data: CategoryDTO) {
-        return this.categoriesService.create(data);
+    public createNewCategory(@User('id') userId, @Body() data: CategoryDTO) {
+        return this.categoriesService.create(data, userId);
     }
 
     /**
@@ -55,8 +54,9 @@ export class CategoriesController {
      * @param id - id of the category
      */
     @Delete(':id')
-    public deleteCategory(@Param('id') id: string) {
-        return this.categoriesService.delete(id);
+    @UseGuards(new AuthGuard())
+    public deleteCategory(@User('id') userId, @Param('id') id: string) {
+        return this.categoriesService.delete(id, userId);
     }
 
     /**
@@ -65,11 +65,13 @@ export class CategoriesController {
      * @param id - id of the category
      */
     @Put(':id')
+    @UseGuards(new AuthGuard())
     @UsePipes(new ValidationPipe())
     public updateCategory(
+        @User('id') userId,
         @Param('id') id: string,
-        @Body() data: Partial<CategoryDTO>
+        @Body() data: Partial < CategoryDTO >
     ) {
-        return this.categoriesService.update(id, data);
+        return this.categoriesService.update(id, data, userId);
     }
 }

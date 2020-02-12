@@ -3,10 +3,6 @@ import { Type } from 'class-transformer';
 
 export class CategoryDTO {
     @IsString()
-    @IsNumberString()
-    creator: string;
-
-    @IsString()
     name: string;
 
     @IsString()

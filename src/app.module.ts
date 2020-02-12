@@ -9,10 +9,11 @@ import { ThreadsModule } from './threads/threads.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
 import { APP_FILTER } from '@nestjs/core';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), CategoriesModule, ThreadsModule, PostsModule, CommentsModule],
-controllers: [AppController],
+  imports: [TypeOrmModule.forRoot(), CategoriesModule, ThreadsModule, PostsModule, CommentsModule, UsersModule],
+  controllers: [AppController],
   providers: [
     AppService,
     {

@@ -9,10 +9,10 @@ export class HttpErrorFilter implements ExceptionFilter {
         const res = ctx.getResponse();
 
         res.status(HttpStatus.BAD_REQUEST || exception.getStatus()).json({
-            code: HttpStatus.BAD_REQUEST || exception.getStatus(),
-            error: exception.name,
-            message: exception.message,
-            timestamp: new Date()
+          code: HttpStatus.BAD_REQUEST || exception.getStatus(),
+          error: exception.name,
+          message: exception.message.message || exception.message,
+          timestamp: new Date()
         });
 
     }
