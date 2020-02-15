@@ -7,12 +7,12 @@ import { AppService } from './app.service';
 import { CategoriesModule } from './categories/categories.module';
 import { ThreadsModule } from './threads/threads.module';
 import { PostsModule } from './posts/posts.module';
-import { CommentsModule } from './comments/comments.module';
 import { APP_FILTER } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), CategoriesModule, ThreadsModule, PostsModule, CommentsModule, UsersModule],
+  imports: [TypeOrmModule.forRoot(), CategoriesModule, ThreadsModule, PostsModule, UsersModule, RolesModule],
   controllers: [AppController],
   providers: [
     AppService,

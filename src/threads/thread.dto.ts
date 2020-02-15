@@ -1,18 +1,18 @@
 import {
     IsString,
-    IsObject,
-    MaxLength
+    MaxLength,
+    IsNumberString
 } from 'class-validator';
 
-export class CategoryDTO {
+export class ThreadDTO {
+    @IsNumberString()
+    categoryId: string;
+
     @IsString()
     @MaxLength(256)
-    name: string;
+    title: string;
 
     @IsString()
     @MaxLength(512)
     description: string;
-
-    @IsObject()
-    advancedPerms: object;
 }

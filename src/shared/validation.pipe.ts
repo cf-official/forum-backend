@@ -49,7 +49,7 @@ export class ValidationPipe implements PipeTransform<any> {
             }
         }
 
-    }).join(' ,');
+    }).join(', ');
   }
 
   private isEmpty(object: object) {

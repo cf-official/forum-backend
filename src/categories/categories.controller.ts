@@ -24,8 +24,13 @@ export class CategoriesController {
      * Returns all forum categories in JSON format
      */
     @Get()
-    public getAllCategories() {
-        return this.categoriesService.getAllCategories();
+    public getAllCategories(@Body('page') page: number, @Body('newest') newest?: boolean) {
+        return this.categoriesService.getAll(page, newest);
+    }
+
+    @Get(':id/threads')
+    async getThreads(@Param('id') id) {
+        return await this.categoriesService.getThreads(id);
     }
 
     /**
@@ -34,8 +39,8 @@ export class CategoriesController {
     @Post('new')
     @UseGuards(new AuthGuard())
     @UsePipes(new ValidationPipe())
-    public createNewCategory(@User('id') userId, @Body() data: CategoryDTO) {
-        return this.categoriesService.create(data, userId);
+    async createNewCategory(@User('id') userId, @Body() data: CategoryDTO) {
+        return await this.categoriesService.create(data, userId);
     }
 
     /**
@@ -44,8 +49,8 @@ export class CategoriesController {
      * @param id - id of the category
      */
     @Get(':id')
-    public getCategory(@Param('id') id: string) {
-        return this.categoriesService.getCategory(id);
+    async getCategory(@Param('id') id: string) {
+        return await this.categoriesService.getCategory(id);
     }
 
     /**
@@ -55,8 +60,8 @@ export class CategoriesController {
      */
     @Delete(':id')
     @UseGuards(new AuthGuard())
-    public deleteCategory(@User('id') userId, @Param('id') id: string) {
-        return this.categoriesService.delete(id, userId);
+    async deleteCategory(@User('id') userId, @Param('id') id: string) {
+        return await this.categoriesService.delete(id, userId);
     }
 
     /**
@@ -67,11 +72,11 @@ export class CategoriesController {
     @Put(':id')
     @UseGuards(new AuthGuard())
     @UsePipes(new ValidationPipe())
-    public updateCategory(
+    async updateCategory(
         @User('id') userId,
         @Param('id') id: string,
         @Body() data: Partial < CategoryDTO >
     ) {
-        return this.categoriesService.update(id, data, userId);
+        return await this.categoriesService.update(id, data, userId);
     }
 }

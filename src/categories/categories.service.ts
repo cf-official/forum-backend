@@ -24,7 +24,7 @@ import {
 } from 'src/users/user.entity';
 import {
     Permissions
-} from 'src/shared/permissions';
+} from 'src/shared/Permissions';
 
 const uid = new UniqueID({
     customEpoch: 1577836800,
@@ -38,23 +38,56 @@ export class CategoriesService {
         @InjectRepository(UserEntity) private userRepository: Repository < UserEntity >
     ) {}
 
-    async getAllCategories() {
-        return await this.categoryRepository.find();
+    async getAll(page: number = 1, newest?: boolean) {
+        const categories = await this.categoryRepository.find({
+            relations: ['creator', 'threads'],
+            take: 25,
+            skip: 25 * (page - 1),
+            order: newest && {
+                created: 'DESC'
+            },
+        });
+        return categories.map(this.categoryToResponseObject);
+    }
+
+    private categoryToResponseObject(category: CategoryEntity) {
+
+        const responseObject: any = {
+          ...category,
+          creator: category.creator.toResponseObject(false)
+        };
+
+        return responseObject;
     }
 
     async getCategory(id: string) {
-        const category = await this.categoryRepository.findOne(id);
+        const category = await this.categoryRepository.findOne(id, { relations: ['threads', 'creator'] });
         if (!category) {
             throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
         }
-        return category;
+        return this.categoryToResponseObject(category);
+    }
+
+    async getThreads(id: string) {
+        const category = await this.categoryRepository.findOne(id, { relations: ['threads'] });
+
+        if (!category) {
+            throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
+        }
+
+        if (!category.threads) {
+            throw new HttpException('No threads found in this category', HttpStatus.NOT_FOUND);
+        }
+
+        return category.threads;
     }
 
     async create(data: CategoryDTO, userId: string) {
         const user = await this.userRepository.findOne({
             where: {
                 id: userId
-            }
+            },
+            relations: ['categories', 'roles', 'threads', 'posts']
         });
 
         if (!user) {
@@ -72,27 +105,19 @@ export class CategoriesService {
         category.id = uid.getUniqueID() as string;
 
         await this.categoryRepository.save(category);
-        return {
-          ...category,
-          creator: user.toResponseObject(false)
-        };
+        return this.categoryToResponseObject(category);
     }
 
     async delete(id: string, userId: string) {
         const user = await this.userRepository.findOne({
             where: {
                 id: userId
-            }
+            },
+            relations: ['categories', 'roles', 'threads', 'posts']
         });
 
         if (!user) {
             throw new HttpException('Invalid user', HttpStatus.BAD_REQUEST);
-        }
-
-        if (
-            !(user.hasPermission(Permissions.DELETE_CATEGORIES))
-        ) {
-            throw new HttpException('Insufficient permissions', HttpStatus.FORBIDDEN);
         }
 
         const category = await this.categoryRepository.findOne({
@@ -100,18 +125,28 @@ export class CategoriesService {
                 id
             }
         });
+
         if (!category) {
             throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
         }
+
+        if (
+            !(user.hasPermission(Permissions.DELETE_CATEGORIES)) &&
+            category.creator.id !== user.id
+        ) {
+            throw new HttpException('Insufficient permissions', HttpStatus.FORBIDDEN);
+        }
+
         await this.categoryRepository.delete(id);
-        return category;
+        return this.categoryToResponseObject(category);
     }
 
     async update(id: string, data: Partial < CategoryDTO > , userId: string) {
         const user = await this.userRepository.findOne({
             where: {
                 id: userId
-            }
+            },
+            relations: ['categories', 'roles', 'threads', 'posts']
         });
 
         if (!user) {
@@ -129,7 +164,7 @@ export class CategoriesService {
 
         if (
             !(user.hasPermission(Permissions.EDIT_CATEGORIES)) &&
-            !(category.creator === user)
+            category.creator.id !== user.id
         ) {
             throw new HttpException(
                 'Insufficient permissions',
@@ -141,8 +176,9 @@ export class CategoriesService {
         category = await this.categoryRepository.findOne({
             where: {
                 id
-            }
+            },
+            relations: ['categories', 'roles', 'threads', 'posts']
         });
-        return category;
+        return this.categoryToResponseObject(category);
     }
 }

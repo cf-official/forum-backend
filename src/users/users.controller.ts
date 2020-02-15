@@ -1,32 +1,40 @@
-import { Controller, Post, Get, Body, UsePipes, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, UsePipes, UseGuards, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDTO } from './user.dto';
 import { ValidationPipe } from 'src/shared/validation.pipe';
+import { AuthGuard } from 'src/shared/auth.guard';
+import { User } from './user.decorator';
 
-@Controller('api/v1/users')
+@Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
 
   // !DEBUG ONLY!
   @Get()
   async allUsers() {
-    return this.userService.allUsers();
+    return await this.userService.allUsers();
   }
 
   @Get(':id')
-  async getUser() {
-    return null;
+  async getUser(@Param('id') id: string) {
+    return await this.userService.getUser(id);
   }
 
-  @Post('login')
+  @Get('auth/@me')
+  @UseGuards(new AuthGuard())
+  async getLoggedInUser(@User('id') userId: string) {
+    return await this.userService.getCurrentUser(userId);
+  }
+
+  @Post('auth/login')
   @UsePipes(new ValidationPipe())
   async login(@Body() data: UserDTO) {
-    return this.userService.login(data);
+    return await this.userService.login(data);
   }
 
-  @Post('register')
+  @Post('auth/register')
   @UsePipes(new ValidationPipe())
   async register(@Body() data: UserDTO) {
-    return this.userService.register(data);
+    return await this.userService.register(data);
   }
 }
