@@ -10,9 +10,10 @@ import { PostsModule } from './posts/posts.module';
 import { APP_FILTER } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
+import { OauthModule } from './oauth/oauth.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), CategoriesModule, ThreadsModule, PostsModule, UsersModule, RolesModule],
+  imports: [TypeOrmModule.forRoot(), CategoriesModule, ThreadsModule, PostsModule, UsersModule, RolesModule, OauthModule],
   controllers: [AppController],
   providers: [
     AppService,

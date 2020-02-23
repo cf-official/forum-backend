@@ -30,7 +30,7 @@ export class UsersService {
       relations: ['roles', 'categories']
     });
 
-    if (!user || !(await user.validatePassword(password))) {
+    if (!user || (!password && user.accountType === 'regular') || !(await user.validatePassword(password))) {
       throw new HttpException(
         'Invalid username/password',
         HttpStatus.FORBIDDEN
@@ -54,6 +54,7 @@ export class UsersService {
     user.password = password;
     user.email = email;
     user.emailHidden = true;
+    user.accountType = 'regular';
     await this.userRepository.save(user);
 
     return user.toResponseObject();
@@ -74,6 +75,9 @@ export class UsersService {
       where: { id },
       relations: ['categories', 'roles', 'threads', 'posts']
     });
+
+    // tslint:disable-next-line:no-console
+    console.log(id);
 
     if (!user) {
       throw new HttpException('Invalid user', HttpStatus.BAD_REQUEST);

@@ -44,8 +44,11 @@ export class UserEntity {
     })
     email: string;
 
-    @Column('text')
+    @Column('text', { nullable: true })
     password: string;
+
+    @Column('text')
+    accountType: string;
 
     @CreateDateColumn()
     created: Date;
@@ -83,7 +86,9 @@ export class UserEntity {
 
     @BeforeInsert()
     async hashPassword() {
-        this.password = await bcrypt.hash(this.password, 10);
+        if (this.accountType === 'regular') {
+            this.password = await bcrypt.hash(this.password, 10);
+        }
     }
 
     public get permissions(): number {
@@ -151,7 +156,7 @@ export class UserEntity {
         return await bcrypt.compare(pass, this.password);
     }
 
-    private get token() {
+    public get token() {
         const {
             id,
             username
