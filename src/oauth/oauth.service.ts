@@ -111,15 +111,11 @@ export class OauthService {
             }
         }).toPromise();
 
-        console.log(response)
-
         const user: any = await this.http.get(DISCORD_API_ENDPOINT + '/users/@me', {
             headers: {
                 Authorization: `Bearer ${response.data.access_token}`
             }
         }).toPromise();
-
-        console.log(user)
 
         let cfUser = await this.userRepository.findOne({ where: { username: user.data.username } });
 
