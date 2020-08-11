@@ -84,6 +84,10 @@ export class PostsService {
             throw new HttpException('Invalid post', HttpStatus.BAD_REQUEST);
         }
 
+        await this.postRepository.update(id, {
+            views: ++post.views
+        });
+
         return this.postToResponseObject(post);
 
     }

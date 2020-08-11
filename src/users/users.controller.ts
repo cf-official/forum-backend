@@ -4,6 +4,7 @@ import { UserDTO } from './user.dto';
 import { ValidationPipe } from 'src/shared/validation.pipe';
 import { AuthGuard } from 'src/shared/auth.guard';
 import { User } from './user.decorator';
+import { AuthDTO } from 'src/shared/auth.dto';
 
 @Controller('users')
 export class UsersController {
@@ -28,7 +29,7 @@ export class UsersController {
 
   @Post('auth/login')
   @UsePipes(new ValidationPipe())
-  async login(@Body() data: UserDTO) {
+  async login(@Body() data: AuthDTO) {
     return await this.userService.login(data);
   }
 

@@ -48,7 +48,7 @@ export class UserEntity {
     password: string;
 
     @Column('text')
-    accountType: string;
+    accountType: 'github' | 'discord' | 'regular';
 
     @CreateDateColumn()
     created: Date;
@@ -153,6 +153,7 @@ export class UserEntity {
     }
 
     async validatePassword(pass: string) {
+        console.log('{} {}', pass, this.password);
         return await bcrypt.compare(pass, this.password);
     }
 
@@ -172,7 +173,7 @@ export class UserEntity {
     }
 
     hasPermission(permission): boolean {
-        if (this.permissions & Permissions.ADMINISTRATOR) {
+        if (!!(this.permissions & Permissions.ADMINISTRATOR)) {
             return true;
         }
         return !!(this.permissions & permission);

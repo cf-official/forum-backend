@@ -46,6 +46,11 @@ export class ThreadsController {
         return await this.threadsService.getThread(threadId);
     }
 
+    @Get(':id/posts')
+    async getThreadPosts(@Param('id') threadId) {
+        return await this.threadsService.getPosts(threadId);
+    }
+
     @Put(':id')
     @UsePipes(new ValidationPipe())
     @UseGuards(new AuthGuard())

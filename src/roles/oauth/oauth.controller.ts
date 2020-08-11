@@ -13,7 +13,6 @@ export class OauthController {
 
     @Post('github')
     async loginWithGithub(@Body('code') code, @Request() req) {
-        console.log('s');
         return await this.oauthService.loginWithGithub(code);
     }
 

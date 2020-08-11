@@ -11,7 +11,7 @@ import {
     UserEntity
 } from 'src/users/user.entity';
 import {
-    Repository
+    Repository, AdvancedConsoleLogger
 } from 'typeorm';
 import * as qs from 'querystring';
 import { UniqueID } from 'nodejs-snowflake';
@@ -30,7 +30,7 @@ const DISCORD = {
 const GITHUB = {
     client_id: '9135f537e6803cfe5c76',
     client_secret: '9b5f1ee14c3c4116d1ec4c0bb34d992fe0284b14',
-    redirect_uri: 'https://aurora.codeforge.cf/callback'
+    redirect_uri: 'http://localhost:3000/callback'
 };
 
 const uid = new UniqueID({ customEpoch: 1577836800, returnNumber: false });
@@ -54,11 +54,15 @@ export class OauthService {
             }
         }).toPromise();
 
+        console.log(response);
+
         const user: any = await this.http.get('https://api.github.com/user', {
             headers: {
                 Authorization: `token ${response.data.access_token}`
             }
         }).toPromise();
+
+        console.log(user);
 
         let email = user.data.email;
 
