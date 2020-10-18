@@ -21,10 +21,10 @@ export class RolesService {
     ) {}
 
     async getAll() {
-        const posts = await this.roleRepository.find({
+        const roles = await this.roleRepository.find({
             relations: ['users']
         });
-        return posts.map(this.roleToResponseObject);
+        return roles.map(this.roleToResponseObject);
     }
 
     private roleToResponseObject(role: RoleEntity) {

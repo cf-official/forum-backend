@@ -36,3 +36,5 @@ lerna-debug.log*
 # Vulnerable files
 .env
 ormconfig.json
+/.yarn
+/.yarn/*

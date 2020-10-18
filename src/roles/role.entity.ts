@@ -1,14 +1,22 @@
-import { PrimaryColumn, Column, ManyToMany, JoinColumn, CreateDateColumn, UpdateDateColumn, Entity } from 'typeorm';
-import { UserEntity } from 'src/users/user.entity';
-import { BitPerm } from 'src/shared/BitPerm';
+import {
+    PrimaryColumn,
+    Column,
+    ManyToMany,
+    JoinColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
+    Entity,
+    JoinTable,
+} from "typeorm";
+import { UserEntity } from "src/users/user.entity";
+import { BitPerm } from "src/shared/BitPerm";
 
-@Entity('role')
+@Entity("role")
 export class RoleEntity {
-
-    @PrimaryColumn('bigint')
+    @PrimaryColumn("bigint")
     id: string;
 
-    @Column('text', { unique: true })
+    @Column("text", { unique: true })
     name: string;
 
     @CreateDateColumn()
@@ -17,17 +25,15 @@ export class RoleEntity {
     @UpdateDateColumn()
     updated: Date;
 
-    @Column('integer', { unique: true })
+    @Column("integer", { unique: true })
     position: number;
 
-    @Column('integer')
+    @Column("integer")
     allowed: number;
 
-    @Column('integer')
+    @Column("integer")
     denied: number;
 
-    @ManyToMany(type => UserEntity, { cascade: true })
-    @JoinColumn()
+    @ManyToMany((type) => UserEntity, (user) => user.roles)
     users: UserEntity[];
-
 }

@@ -7,19 +7,13 @@ import {
     UpdateDateColumn,
     BeforeInsert,
     ManyToMany,
-    OneToMany
+    OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import {
-    CategoryEntity
-} from 'src/categories/category.entity';
-import {
-    Permissions
-} from 'src/shared/Permissions';
-import {
-    ThreadEntity
-} from 'src/threads/thread.entity';
+import { CategoryEntity } from 'src/categories/category.entity';
+import { Permissions } from 'src/shared/Permissions';
+import { ThreadEntity } from 'src/threads/thread.entity';
 import { PostEntity } from 'src/posts/post.entity';
 import { RoleEntity } from 'src/roles/role.entity';
 import { BitPerm } from 'src/shared/BitPerm';
@@ -31,7 +25,7 @@ export class UserEntity {
 
     @Column({
         type: 'text',
-        unique: true
+        unique: true,
     })
     username: string;
 
@@ -40,7 +34,7 @@ export class UserEntity {
 
     @Column({
         type: 'text',
-        unique: true
+        unique: true,
     })
     email: string;
 
@@ -57,29 +51,30 @@ export class UserEntity {
     updated: Date;
 
     @ManyToMany(
-        type => RoleEntity,
-        role => role.users
+        (type) => RoleEntity,
+        (role) => role.users,
+        { cascade: true }
     )
     @JoinTable()
     roles: RoleEntity[];
 
     @OneToMany(
         () => CategoryEntity,
-        category => category.creator,
+        (category) => category.creator,
         { cascade: true }
     )
     categories: CategoryEntity[];
 
     @OneToMany(
         () => ThreadEntity,
-        thread => thread.author,
+        (thread) => thread.author,
         { cascade: true }
     )
     threads: CategoryEntity[];
 
     @OneToMany(
         () => PostEntity,
-        post => post.author,
+        (post) => post.author,
         { cascade: true }
     )
     posts: PostEntity[];
@@ -92,37 +87,36 @@ export class UserEntity {
     }
 
     public get permissions(): number {
-
         const permissions = new BitPerm(0x0);
 
         if (!this.roles) {
-            return 0x0;
+            return Permissions.CREATE_POSTS;
         }
 
-        this.roles.sort((n1, n2) => n1.position - n2.position).reverse().forEach((role) => {
-            permissions.set(role.allowed);
-            permissions.unset(role.denied);
-        });
+        this.roles
+            .sort((n1, n2) => n1.position - n2.position)
+            .reverse()
+            .forEach((role) => {
+                permissions.set(role.allowed);
+                permissions.unset(role.denied);
+            });
+
+        if (permissions.has(Permissions.MANAGE_ROLES) || permissions.has(Permissions.ASSIGN_ROLES) || permissions.has(Permissions.ADMINISTRATOR)) {
+            permissions.set(Permissions.ACCESS_CONTROL_PANEL);
+        }
 
         return permissions.permissions;
     }
 
     toResponseObject(showToken: boolean = true) {
-        const {
-            id,
-            username,
-            email,
-            created,
-            updated,
-            permissions
-        } = this;
+        const { id, username, email, created, updated, permissions } = this;
 
         const resObj: any = {
             id,
             username,
             created,
             updated,
-            permissions
+            permissions,
         };
 
         if (this.roles) {
@@ -130,15 +124,15 @@ export class UserEntity {
         }
 
         if (this.categories) {
-            resObj.categories = this.categories.map(category => category.id);
+            resObj.categories = this.categories.map((category) => category.id);
         }
 
         if (this.threads) {
-            resObj.threads = this.threads.map(thread => thread.id);
+            resObj.threads = this.threads.map((thread) => thread.id);
         }
 
         if (this.posts) {
-            resObj.posts = this.posts.map(post => post.id);
+            resObj.posts = this.posts.map((post) => post.id);
         }
 
         if (showToken) {
@@ -153,21 +147,19 @@ export class UserEntity {
     }
 
     async validatePassword(pass: string) {
-        console.log('{} {}', pass, this.password);
         return await bcrypt.compare(pass, this.password);
     }
 
     public get token() {
-        const {
-            id,
-            username
-        } = this;
-        return jwt.sign({
+        const { id, username } = this;
+        return jwt.sign(
+            {
                 id,
-                username
+                username,
             },
-            process.env.SECRET, {
-                expiresIn: '7d'
+            process.env.SECRET,
+            {
+                expiresIn: '2m',
             }
         );
     }

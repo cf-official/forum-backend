@@ -24,6 +24,9 @@ export enum Permissions {
   MANAGE_ROLES = 1 << 12,
   ASSIGN_ROLES = 1 << 13,
 
+  // Hidden permissions
+  ACCESS_CONTROL_PANEL = 1 << 14,
+
   // Presets
   DEFAULT_USER = CREATE_POSTS | COMMENT_POSTS | CREATE_THREADS
 }
