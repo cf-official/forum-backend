@@ -11,7 +11,7 @@ export class HttpErrorFilter implements ExceptionFilter {
         res.status(HttpStatus.BAD_REQUEST || exception.getStatus()).json({
           code: HttpStatus.BAD_REQUEST || exception.getStatus(),
           error: exception.name,
-          message: exception.message.message || exception.message,
+          message: (exception.message as any).message || exception.message,
           timestamp: new Date()
         });
 

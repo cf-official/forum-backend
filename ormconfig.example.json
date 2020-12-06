@@ -1,0 +1,12 @@
+{
+    "type": "postgres",
+    "host": "ip",
+    "port": "5432",
+    "username": "",
+    "password": "",
+    "database": "codeforge",
+    "logging": false,
+    "synchronize": true,
+    "entities": ["./dist/**/*.entity.js"],
+    "schema": "forum"
+}
